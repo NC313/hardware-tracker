@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Component = require('../models/Component');
+const auth = require('../middleware/auth');
 
 // GET all components
 router.get('/', async (req, res) => {
@@ -13,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST a new component
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const component = new Component({
     name: req.body.name,
     status: req.body.status,
@@ -29,7 +30,7 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH - update status and log the change
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', auth, async (req, res) => {
   try {
     const component = await Component.findById(req.params.id);
     if (!component) return res.status(404).json({ message: 'Not found' });
@@ -55,7 +56,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // DELETE a component
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const component = await Component.findByIdAndDelete(req.params.id)
     if (!component) return res.status(404).json({ message: 'Not found' })
