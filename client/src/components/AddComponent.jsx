@@ -16,9 +16,9 @@ function AddComponent({ onAdd }) {
     <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
       <h2>Add Component</h2>
       <form onSubmit={handleSubmit}>
-        <input placeholder="Component name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%' }} />
-        <input placeholder="Your name" value={form.updatedBy} onChange={e => setForm({...form, updatedBy: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%' }} />
-        <input placeholder="Notes" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%' }} />
+        <input placeholder="Component name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
+        <input placeholder="Your name" value={form.updatedBy} onChange={e => setForm({...form, updatedBy: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
+        <input placeholder="Notes" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
         <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px' }}>
           <option value="prototype">Prototype</option>
           <option value="testing">Testing</option>

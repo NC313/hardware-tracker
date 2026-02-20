@@ -16,7 +16,7 @@ function App() {
   }, [])
 
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: '800px', width: '100%', margin: '40px auto', padding: '0 20px', fontFamily: 'sans-serif', boxSizing: 'border-box' }}>
       <h1>Hardware Tracker</h1>
       <AddComponent onAdd={fetchComponents} />
       <ComponentList components={components} onUpdate={fetchComponents} />
