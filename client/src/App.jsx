@@ -15,7 +15,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
   const fetchComponents = async () => {
-    const res = await axios.get('http://localhost:5000/api/components')
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/components`)
     setComponents(res.data)
   }
 

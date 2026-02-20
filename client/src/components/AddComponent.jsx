@@ -7,7 +7,7 @@ function AddComponent({ onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.name) return
-    await axios.post('http://localhost:5000/api/components', form)
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/components`, form)
     setForm({ name: '', status: 'prototype', notes: '', updatedBy: '' })
     onAdd()
   }

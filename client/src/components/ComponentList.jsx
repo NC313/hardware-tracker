@@ -25,7 +25,7 @@ function StatusBadge({ status }) {
 
 function ComponentList({ components, onUpdate }) {
   const handleStatusChange = async (id, newStatus, updatedBy) => {
-    await axios.patch(`http://localhost:5000/api/components/${id}`, {
+    await axios.patch(`${import.meta.env.VITE_API_URL}/api/components/${id}`, {
       status: newStatus,
       updatedBy: updatedBy || 'anonymous'
     })
@@ -34,7 +34,7 @@ function ComponentList({ components, onUpdate }) {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this component?')) return
-    await axios.delete(`http://localhost:5000/api/components/${id}`)
+    await axios.delete(`${import.meta.env.VITE_API_URL}/api/components/${id}`)
     onUpdate()
   }
 

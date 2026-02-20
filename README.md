@@ -1,5 +1,7 @@
 # Hardware Tracker
 
+🚀 [https://hardware-tracker-rho.vercel.app](https://hardware-tracker-rho.vercel.app)
+
 A full-stack web app for tracking hardware components through development stages — built with React, Node.js, Express, and MongoDB.
 
 ## Why I Built This
@@ -53,10 +55,10 @@ While built for hardware tracking, the architecture is intentionally generic. Sw
 Returns a JWT token. Add it as a **Bearer token** in the Authorization header for all protected routes.
 
 ### Google OAuth
-Visit `http://localhost:5000/api/auth/google` in your browser to sign in with Google. You'll be redirected back to the app with a token automatically.
+Visit `https://hardware-tracker-api.onrender.com/api/auth/google` in your browser to sign in with Google. You'll be redirected back to the app with a token automatically.
 
 ### GitHub OAuth
-Visit `http://localhost:5000/api/auth/github` in your browser to sign in with GitHub. You'll be redirected back to the app with a token automatically.
+Visit `https://hardware-tracker-api.onrender.com/api/auth/github` in your browser to sign in with GitHub. You'll be redirected back to the app with a token automatically.
 
 ## Role-Based Access
 
@@ -82,6 +84,7 @@ New users default to `viewer`. Admin role must be assigned manually via the data
 | GET | /api/auth/github | No | - | Login with GitHub |
 
 ## Getting Started
+>For local development, follow the steps below. For production deployment, see the [Deployment](#deployment) section.
 
 ### Prerequisites
 - Node.js
@@ -124,6 +127,29 @@ cd server && npm run dev
 ```
 cd client && npm run dev
 ```
+
+## Deployment
+
+### Backend (Render)
+1. Create a new Web Service on [render.com](https://render.com)
+2. Connect your GitHub repo
+3. Set Root Directory to `server`
+4. Set Build Command to `npm install`
+5. Set Start Command to `node index.js`
+6. Add all environment variables from `.env.example`
+
+### Frontend (Vercel)
+1. Create a new project on [vercel.com](https://vercel.com)
+2. Connect your GitHub repo
+3. Set Root Directory to `client`
+4. Set Framework Preset to `Vite`
+5. Add environment variable `VITE_API_URL` pointing to your Render URL
+6. Deploy
+
+### Database (MongoDB Atlas)
+1. Create a free cluster at [mongodb.com/cloud/atlas](https://mongodb.com/cloud/atlas)
+2. Whitelist your Render server's IP (or use `0.0.0.0/0` for open access)
+3. Copy the connection string into your `MONGO_URI` env variable
 
 ## How It Works (Non-Technical)
 
