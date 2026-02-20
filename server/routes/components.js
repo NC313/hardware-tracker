@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Component = require('../models/Component');
 const auth = require('../middleware/auth');
+const checkRole = require('../middleware/role');
 
-// GET all components
+// GET all components - public
 router.get('/', async (req, res) => {
   try {
     const components = await Component.find();
@@ -13,8 +14,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new component
-router.post('/', auth, async (req, res) => {
+// POST a new component - admin only
+router.post('/', auth, checkRole('admin'), async (req, res) => {
   const component = new Component({
     name: req.body.name,
     status: req.body.status,
@@ -29,8 +30,8 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// PATCH - update status and log the change
-router.patch('/:id', auth, async (req, res) => {
+// PATCH - admin only
+router.patch('/:id', auth, checkRole('admin'), async (req, res) => {
   try {
     const component = await Component.findById(req.params.id);
     if (!component) return res.status(404).json({ message: 'Not found' });
@@ -40,7 +41,6 @@ router.patch('/:id', auth, async (req, res) => {
     component.notes = req.body.notes || component.notes;
     component.updatedBy = req.body.updatedBy || component.updatedBy;
 
-    // Log the activity if status changed
     if (req.body.status && req.body.status !== oldStatus) {
       component.activityLog.push({
         changedTo: req.body.status,
@@ -55,8 +55,8 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
-// DELETE a component
-router.delete('/:id', auth, async (req, res) => {
+// DELETE - admin only
+router.delete('/:id', auth, checkRole('admin'), async (req, res) => {
   try {
     const component = await Component.findByIdAndDelete(req.params.id)
     if (!component) return res.status(404).json({ message: 'Not found' })
