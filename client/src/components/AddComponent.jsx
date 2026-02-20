@@ -12,19 +12,65 @@ function AddComponent({ onAdd }) {
     onAdd()
   }
 
+  const inputStyle = {
+    width: '100%',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: '1px solid #e5e7eb',
+    fontSize: '14px',
+    outline: 'none',
+    boxSizing: 'border-box',
+    color: '#111827',
+    background: 'white'
+  }
+
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-      <h2>Add Component</h2>
-      <form onSubmit={handleSubmit}>
-        <input placeholder="Component name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
-        <input placeholder="Your name" value={form.updatedBy} onChange={e => setForm({...form, updatedBy: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
-        <input placeholder="Notes" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px', width: '100%', boxSizing: 'border-box' }} />
-        <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} style={{ display: 'block', marginBottom: '8px', padding: '8px' }}>
+    <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb' }}>
+      <div style={{ fontSize: '16px', fontWeight: '600', color: '#111827', marginBottom: '16px' }}>
+        Add Component
+      </div>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <input
+          placeholder="Component name"
+          value={form.name}
+          onChange={e => setForm({ ...form, name: e.target.value })}
+          style={inputStyle}
+        />
+        <input
+          placeholder="Your name"
+          value={form.updatedBy}
+          onChange={e => setForm({ ...form, updatedBy: e.target.value })}
+          style={inputStyle}
+        />
+        <input
+          placeholder="Notes"
+          value={form.notes}
+          onChange={e => setForm({ ...form, notes: e.target.value })}
+          style={inputStyle}
+        />
+        <select
+          value={form.status}
+          onChange={e => setForm({ ...form, status: e.target.value })}
+          style={{ ...inputStyle, width: 'auto' }}
+        >
           <option value="prototype">Prototype</option>
           <option value="testing">Testing</option>
           <option value="shipped">Shipped</option>
         </select>
-        <button type="submit" style={{ padding: '8px 16px', background: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Add Component</button>
+        <div>
+          <button type="submit" style={{
+            padding: '10px 20px',
+            background: '#111827',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer'
+          }}>
+            Add Component
+          </button>
+        </div>
       </form>
     </div>
   )
