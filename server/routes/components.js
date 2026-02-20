@@ -54,4 +54,15 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
+// DELETE a component
+router.delete('/:id', async (req, res) => {
+  try {
+    const component = await Component.findByIdAndDelete(req.params.id)
+    if (!component) return res.status(404).json({ message: 'Not found' })
+    res.json({ message: 'Component deleted' })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 module.exports = router;
