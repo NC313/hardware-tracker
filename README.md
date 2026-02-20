@@ -13,17 +13,20 @@ The activity log pattern means nothing gets lost. Every status change is recorde
 While built for hardware tracking, the architecture is intentionally generic. Swapping the status values from `prototype/testing/shipped` to `backlog/in-progress/done` turns this into a lightweight Scrum board. Change them to `procurement/deployed/decommissioned` and it becomes an IT asset tracker. The core pattern — items moving through stages with a full audit trail — applies to almost any workflow.
 
 ## Tech Stack
-- **Frontend:** React, Vite, Axios
+- **Frontend:** React, Vite, Axios, Tailwind CSS, shadcn/ui, Recharts
 - **Backend:** Node.js, Express
 - **Database:** MongoDB, Mongoose
-- **Auth:** JWT + bcrypt + Google OAuth (Passport.js)
+- **Auth:** JWT + bcrypt + Google OAuth + GitHub OAuth (Passport.js)
+- **Deployment:** Vercel (frontend), Render (backend), MongoDB Atlas (database)
 
 ## Features
-- Add and manage hardware components
+- Add, update and delete hardware components
 - Track status: Prototype → Testing → Shipped
 - Automatic activity log on every status change
-- Full authentication — register, login, or sign in with Google
-- Protected routes — only authenticated users can create, update, or delete
+- CRM-style dashboard with donut chart and activity feed
+- Sidebar navigation with live component count
+- Full authentication — register, login, Google OAuth, GitHub OAuth
+- Role-based access control — admins can create/update/delete, viewers can read
 - Password hashing with bcrypt — credentials never stored in plain text
 - Built with async-first architecture — easy to extend
 
@@ -52,23 +55,37 @@ Returns a JWT token. Add it as a **Bearer token** in the Authorization header fo
 ### Google OAuth
 Visit `http://localhost:5000/api/auth/google` in your browser to sign in with Google. You'll be redirected back to the app with a token automatically.
 
+### GitHub OAuth
+Visit `http://localhost:5000/api/auth/github` in your browser to sign in with GitHub. You'll be redirected back to the app with a token automatically.
+
+## Role-Based Access
+
+| Role | GET | POST | PATCH | DELETE |
+|------|-----|------|-------|--------|
+| Public | ✅ | ❌ | ❌ | ❌ |
+| Viewer | ✅ | ❌ | ❌ | ❌ |
+| Admin | ✅ | ✅ | ✅ | ✅ |
+
+New users default to `viewer`. Admin role must be assigned manually via the database.
+
 ## API Routes
 
-| Method | Route | Auth Required | Description |
-|--------|-------|---------------|-------------|
-| GET | /api/components | No | Get all components |
-| POST | /api/components | Yes | Create a component |
-| PATCH | /api/components/:id | Yes | Update a component |
-| DELETE | /api/components/:id | Yes | Delete a component |
-| POST | /api/auth/register | No | Register a new user |
-| POST | /api/auth/login | No | Login and get token |
-| GET | /api/auth/google | No | Login with Google |
+| Method | Route | Auth Required | Role | Description |
+|--------|-------|---------------|------|-------------|
+| GET | /api/components | No | Any | Get all components |
+| POST | /api/components | Yes | Admin | Create a component |
+| PATCH | /api/components/:id | Yes | Admin | Update a component |
+| DELETE | /api/components/:id | Yes | Admin | Delete a component |
+| POST | /api/auth/register | No | - | Register a new user |
+| POST | /api/auth/login | No | - | Login and get token |
+| GET | /api/auth/google | No | - | Login with Google |
+| GET | /api/auth/github | No | - | Login with GitHub |
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js
-- MongoDB running locally
+- MongoDB running locally OR MongoDB Atlas account
 
 ### Installation
 
@@ -93,6 +110,8 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 SESSION_SECRET=your_session_secret
 ```
 
@@ -110,11 +129,20 @@ cd client && npm run dev
 
 Hardware Tracker lets engineering teams log and track hardware components through their development lifecycle — from prototype to testing to shipped.
 
-Every time a component's status changes, the app automatically logs who changed it and when, creating a full audit trail. Team members sign in securely with their Google account or register directly, and every action is tied to a real user.
+Every time a component's status changes, the app automatically logs who changed it and when, creating a full audit trail. Team members sign in securely with Google, GitHub, or by registering directly. Admins can make changes while viewers have read-only access.
+
+## Demo Walkthrough
+
+### Testing Role-Based Auth
+1. Register a new user via `POST /api/auth/register` — defaults to viewer
+2. Try to POST a component with that token — returns `403 Access denied`
+3. Update user role to `admin` in the database
+4. Login again to get a fresh token with admin role
+5. POST a component with the new token — returns `201 success`
 
 ## What's Next
+- Auth0 integration for enterprise-grade authentication
 - Filter and search components by status
-- Recharts dashboard showing component pipeline at a glance
 - Export activity logs for compliance reporting
-- Role-based access — admins vs read-only viewers
-- Deploy to production with Vercel and Render
+- Role management UI — promote users to admin from the dashboard
+- Email notifications on status changes
