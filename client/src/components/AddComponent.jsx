@@ -7,7 +7,7 @@ function AddComponent({ onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.name) return
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/components`, form)
+    await axios.post(`https://hardware-tracker-api.onrender.com/api/components`, form)
     setForm({ name: '', status: 'prototype', notes: '', updatedBy: '' })
     onAdd()
   }

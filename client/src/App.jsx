@@ -15,7 +15,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
 
   const fetchComponents = async () => {
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/components`)
+    const res = await axios.get(`https://hardware-tracker-api.onrender.com/api/components`)
     setComponents(res.data)
   }
 
