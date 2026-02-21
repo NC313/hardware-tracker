@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import axios from 'axios'
 
-function AddComponent({ onAdd }) {
-  const [form, setForm] = useState({ name: '', status: 'prototype', notes: '', updatedBy: '' })
+function AddComponent({ onAdd, username }) {
+  const [form, setForm] = useState({ name: '', status: 'prototype', notes: '', updatedBy: username || '' })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.name) return
     await axios.post(`https://hardware-tracker-api.onrender.com/api/components`, form)
-    setForm({ name: '', status: 'prototype', notes: '', updatedBy: '' })
+    setForm({ name: '', status: 'prototype', notes: '', updatedBy: username || '' })
     onAdd()
   }
 
@@ -34,12 +34,6 @@ function AddComponent({ onAdd }) {
           placeholder="Component name"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
-          style={inputStyle}
-        />
-        <input
-          placeholder="Your name"
-          value={form.updatedBy}
-          onChange={e => setForm({ ...form, updatedBy: e.target.value })}
           style={inputStyle}
         />
         <input

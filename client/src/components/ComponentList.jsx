@@ -23,7 +23,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function ComponentList({ components, onUpdate }) {
+function ComponentList({ components, onUpdate, userRole }) {
   const handleStatusChange = async (id, newStatus, updatedBy) => {
    await axios.patch(`https://hardware-tracker-api.onrender.com/api/components/${id}`, {
   status: newStatus,
@@ -66,41 +66,43 @@ function ComponentList({ components, onUpdate }) {
               <span><strong style={{ color: '#374151' }}>Last updated by:</strong> {c.updatedBy}</span>
             </div>
 
-            {/* Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <select
-                value={c.status}
-                onChange={e => handleStatusChange(c._id, e.target.value, c.updatedBy)}
-                style={{
-                  padding: '7px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e7eb',
-                  fontSize: '13px',
-                  outline: 'none',
-                  background: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="prototype">Prototype</option>
-                <option value="testing">Testing</option>
-                <option value="shipped">Shipped</option>
-              </select>
-              <button
-                onClick={() => handleDelete(c._id)}
-                style={{
-                  padding: '7px 14px',
-                  background: '#fee2e2',
-                  color: '#dc2626',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
-                }}
-              >
-                Delete
-              </button>
-            </div>
+            {/* Actions (admin only) */}
+            {userRole === 'admin' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <select
+                  value={c.status}
+                  onChange={e => handleStatusChange(c._id, e.target.value, c.updatedBy)}
+                  style={{
+                    padding: '7px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid #e5e7eb',
+                    fontSize: '13px',
+                    outline: 'none',
+                    background: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="prototype">Prototype</option>
+                  <option value="testing">Testing</option>
+                  <option value="shipped">Shipped</option>
+                </select>
+                <button
+                  onClick={() => handleDelete(c._id)}
+                  style={{
+                    padding: '7px 14px',
+                    background: '#fee2e2',
+                    color: '#dc2626',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )}
 
             {/* Activity Log */}
             <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: '12px' }}>

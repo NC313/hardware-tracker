@@ -8,13 +8,21 @@ passport.use(new GoogleStrategy({
   callbackURL: '/api/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    let user = await User.findOne({ email: profile.emails[0].value });
+    const email = profile.emails[0].value;
+    let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
         username: profile.displayName,
-        email: profile.emails[0].value,
-        password: 'oauth'
+        email,
+        password: 'oauth',
+        role: User.roleForEmail(email)
       });
+    } else {
+      const correctRole = User.roleForEmail(email);
+      if (user.role !== correctRole) {
+        user.role = correctRole;
+        await user.save();
+      }
     }
     done(null, user);
   } catch (err) {
@@ -36,8 +44,15 @@ passport.use(new GitHubStrategy({
       user = await User.create({
         username: profile.username,
         email,
-        password: 'oauth'
+        password: 'oauth',
+        role: User.roleForEmail(email)
       })
+    } else {
+      const correctRole = User.roleForEmail(email)
+      if (user.role !== correctRole) {
+        user.role = correctRole
+        await user.save()
+      }
     }
     done(null, user)
   } catch (err) {

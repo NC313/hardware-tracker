@@ -12,7 +12,8 @@ router.post('/register', async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'User already exists' });
     const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashed });
+    const role = User.roleForEmail(email);
+    const user = new User({ username, email, password: hashed, role });
     await user.save();
     const token = jwt.sign(
       { username: user.username, email: user.email, role: user.role },
@@ -33,6 +34,12 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
+    // Sync role in case admin list changed since registration
+    const correctRole = User.roleForEmail(user.email);
+    if (user.role !== correctRole) {
+      user.role = correctRole;
+      await user.save();
+    }
     const token = jwt.sign(
       { username: user.username, email: user.email, role: user.role },
       process.env.JWT_SECRET,
@@ -55,7 +62,7 @@ router.get('/google/callback',
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
-    res.redirect(`http://localhost:5173?token=${token}`);
+    res.redirect(`${process.env.CLIENT_URL}?token=${token}`);
   }
 );
 
@@ -70,7 +77,7 @@ router.get('/github/callback',
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
-    res.redirect(`http://localhost:5173?token=${token}`);
+    res.redirect(`${process.env.CLIENT_URL}?token=${token}`);
   }
 );
 

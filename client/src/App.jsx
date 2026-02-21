@@ -3,16 +3,64 @@ import axios from 'axios'
 import ComponentList from './components/ComponentList'
 import AddComponent from './components/AddComponent'
 import Dashboard from './components/Dashboard'
+import LoginPage from './components/LoginPage'
+import { saveToken, getToken, removeToken, decodeToken, isTokenValid } from './auth'
 
-const NAV_ITEMS = [
+const NAV_ITEMS_ADMIN = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'components', label: 'Components', icon: '🔧' },
   { id: 'add', label: 'Add Component', icon: '➕' },
 ]
 
+const NAV_ITEMS_VIEWER = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+  { id: 'components', label: 'Components', icon: '🔧' },
+]
+
 function App() {
   const [components, setComponents] = useState([])
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [token, setToken] = useState(() => {
+    const t = getToken()
+    return isTokenValid(t) ? t : null
+  })
+  const [user, setUser] = useState(() => {
+    const t = getToken()
+    return isTokenValid(t) ? decodeToken(t) : null
+  })
+
+  // Handle OAuth redirect — grab ?token= from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const urlToken = params.get('token')
+    if (urlToken && isTokenValid(urlToken)) {
+      handleLogin(urlToken)
+      // Clean the URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [])
+
+  // Set axios default auth header whenever token changes
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    } else {
+      delete axios.defaults.headers.common['Authorization']
+    }
+  }, [token])
+
+  const handleLogin = (newToken) => {
+    saveToken(newToken)
+    setToken(newToken)
+    setUser(decodeToken(newToken))
+  }
+
+  const handleLogout = () => {
+    removeToken()
+    setToken(null)
+    setUser(null)
+    setActiveTab('dashboard')
+  }
 
   const fetchComponents = async () => {
     const res = await axios.get(`https://hardware-tracker-api.onrender.com/api/components`)
@@ -20,8 +68,16 @@ function App() {
   }
 
   useEffect(() => {
-    fetchComponents()
-  }, [])
+    if (token) fetchComponents()
+  }, [token])
+
+  // Not logged in — show login page
+  if (!token || !user) {
+    return <LoginPage onLogin={handleLogin} />
+  }
+
+  const navItems = user.role === 'admin' ? NAV_ITEMS_ADMIN : NAV_ITEMS_VIEWER
+  const initial = user.username ? user.username.charAt(0).toUpperCase() : '?'
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f9fafb', fontFamily: 'sans-serif' }}>
@@ -47,7 +103,7 @@ function App() {
 
         {/* Nav Items */}
         <nav style={{ padding: '12px 0', flex: 1 }}>
-          {NAV_ITEMS.map(item => (
+          {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
@@ -76,19 +132,34 @@ function App() {
 
         {/* Bottom user section */}
         <div style={{ padding: '16px 20px', borderTop: '1px solid #1f2937' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
             <div style={{
               width: '32px', height: '32px', borderRadius: '50%',
               background: '#6366f1', display: 'flex', alignItems: 'center',
               justifyContent: 'center', fontSize: '14px', fontWeight: '700', color: 'white'
             }}>
-              N
+              {initial}
             </div>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: '600', color: 'white' }}>Nathaniel</div>
-              <div style={{ fontSize: '11px', color: '#6b7280' }}>Admin</div>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: 'white' }}>{user.username}</div>
+              <div style={{ fontSize: '11px', color: '#6b7280', textTransform: 'capitalize' }}>{user.role}</div>
             </div>
           </div>
+          <button
+            onClick={handleLogout}
+            style={{
+              width: '100%',
+              padding: '8px',
+              background: '#1f2937',
+              color: '#9ca3af',
+              border: '1px solid #374151',
+              borderRadius: '6px',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            Sign Out
+          </button>
         </div>
       </div>
 
@@ -134,11 +205,11 @@ function App() {
             <Dashboard components={components} />
           )}
           {activeTab === 'components' && (
-            <ComponentList components={components} onUpdate={fetchComponents} />
+            <ComponentList components={components} onUpdate={fetchComponents} userRole={user.role} />
           )}
           {activeTab === 'add' && (
             <div style={{ maxWidth: '600px' }}>
-              <AddComponent onAdd={() => { fetchComponents(); setActiveTab('components') }} />
+              <AddComponent onAdd={() => { fetchComponents(); setActiveTab('components') }} username={user.username} />
             </div>
           )}
         </div>
