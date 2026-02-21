@@ -38,7 +38,15 @@ passport.use(new GitHubStrategy({
   callbackURL: '/api/auth/github/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    const email = profile.emails?.[0]?.value || `${profile.username}@github.com`
+    let email = profile.emails?.[0]?.value
+    if (!email) {
+      const res = await fetch('https://api.github.com/user/emails', {
+        headers: { Authorization: `token ${accessToken}`, 'User-Agent': 'HardwareTracker' }
+      })
+      const emails = await res.json()
+      const primary = emails.find(e => e.primary) || emails[0]
+      email = primary?.email || `${profile.username}@github.com`
+    }
     let user = await User.findOne({ email })
     if (!user) {
       user = await User.create({
